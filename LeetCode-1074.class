@@ -1,0 +1,41 @@
+/*
+    1074. Number of Submatrices That Sum to Target
+
+    Given a matrix and a target, return the number of non-empty submatrices that sum to target.
+    A submatrix x1, y1, x2, y2 is the set of all cells matrix[x][y] with x1 <= x <= x2 and y1 <= y <= y2.
+    Two submatrices (x1, y1, x2, y2) and (x1', y1', x2', y2') are different if they have some coordinate that is different: for example, if x1 != x1'.
+*/
+
+class Solution {
+
+    public int numSubmatrixSumTarget(int[][] matrix, int target) {
+
+        int height = matrix.length;
+        int width = matrix[0].length;
+        int count = 0;
+
+
+        for (int h = 0; h < height; h++) {
+            for (int w = 1; w < width; w++) {
+                matrix[h][w] += matrix[h][w-1];
+            }
+        }
+
+        Map<Integer, Integer> dict = new HashMap<>();
+        for (int w=0; w < width; w++) { // start col
+            for (int h=w; h < width; h++) { // curr col |
+                dict.clear();
+
+                dict.put(0, 1);
+                int cur_sum = 0;
+                for(int k = 0; k < height; k++) { // curr row ->
+                    cur_sum += matrix[k][h] - (w > 0? matrix[k][w-1]: 0);
+                    count += dict.getOrDefault(cur_sum-target, 0);
+                    dict.put(cur_sum, dict.getOrDefault(cur_sum, 0)+1);
+                }
+            }
+        }
+
+        return count;
+    }
+}
